@@ -75,16 +75,16 @@ function buildCharts(sample) {
     // 7. Create the yticks for the bar chart.
     // Hint: Get the the top 10 otu_ids and map them in descending order  
     //  so the otu_ids with the most bacteria are last. 
-    var yticks = otu_ids.slice(0,10).map(otuID => 'OTU ${otuID}').reverse();
+    var yticks = otu_ids.slice(0,10).map(otuID => `OTU ${otuID}`).reverse();
 
     // 8. Create the trace for the bar chart. 
-    var barData = {
+    var barData = [{
       x: sample_values.slice(0,10).reverse(),
       y: yticks,
       text: otu_labels.slice(0,10).reverse(),
       orientation: "h",
       type: "bar",
-      };
+      }];
 
     // 9. Create the layout for the bar chart. 
     var barLayout = {
@@ -93,6 +93,45 @@ function buildCharts(sample) {
       };
     // 10. Use Plotly to plot the data with the layout. 
     Plotly.newPlot ("bar", barData, barLayout);
+  });
+}
+
+// Bar and Bubble charts
+// Create the buildCharts function.
+function buildCharts(sample) {
+  // Use d3.json to load and retrieve the samples.json file 
+  d3.json("samples.json").then((data) => {
+
+    var sampleData = data.samples;
+    var sampleArray = sampleData.filter(sampleObj => sampleObj.id == sample);
+    var result = sampleArray;
+    var otu_ids = result.otu_ids;
+    var otu_labels = result.otu_labels;
+    var sample_values = result.sample_values;
+
+    // 1. Create the trace for the bubble chart.
+    var bubbleData = [{
+      x: otu_ids,
+      y: sample_values,
+      text: otu_ids,
+      mode: 'markers',
+      type: 'scatter',
+      marker: {
+        color: ['rgb(93, 164, 214)', 'rgb(255, 144, 14)',  'rgb(44, 160, 101)', 'rgb(255, 65, 54)'],
+        size: [40, 60, 80, 100],
+        sizemode: "area"
+      }
+    }];
+
+    // 2. Create the layout for the bubble chart.
+    var bubbleLayout = {
+      title: "Bacteria Cultures Per Sample",
+      xaxis: "OTU ID",
+      margin: {t:30,l:150}
+    };
+
+    // 3. Use Plotly to plot the data with the layout.
+    Plotly.newPlot('bubble', bubbleData, bubbleLayout); 
   });
 }
 
